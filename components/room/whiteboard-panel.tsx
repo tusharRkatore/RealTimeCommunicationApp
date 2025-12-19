@@ -2,12 +2,12 @@
 
 import type React from "react"
 
-import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
-import { Eraser, Pen, Trash2, Circle, Square, Minus } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import type { RealtimeChannel } from "@supabase/supabase-js"
+import { Circle, Eraser, Minus, Pen, Square, Trash2 } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 
 interface WhiteboardPanelProps {
   roomId: string
@@ -361,19 +361,23 @@ export function WhiteboardPanel({ roomId, userId }: WhiteboardPanelProps) {
         </div>
 
         {/* Colors */}
-        <div className="mb-4">
-          <p className="mb-2 text-sm font-medium">Color</p>
-          <div className="flex gap-2">
-            {COLORS.map((c) => (
-              <button
-                key={c}
-                onClick={() => setColor(c)}
-                className={`h-8 w-8 rounded-full border-2 transition-all ${color === c ? "border-primary scale-110" : "border-border"}`}
-                style={{ backgroundColor: c }}
-              />
-            ))}
-          </div>
-        </div>
+        <div className="flex gap-2">
+  {COLORS.map((c) => (
+    <button
+      key={c}
+      type="button"                       // ✅ prevents form submit bugs
+      onClick={() => setColor(c)}
+      aria-label={`Select color ${c}`}    // ✅ accessibility
+      title={`Select color ${c}`}
+      className={`h-8 w-8 rounded-full border-2 transition-all
+        focus:outline-none focus:ring-2 focus:ring-primary
+        ${color === c ? "border-primary scale-110" : "border-border"}
+      `}
+      style={{ backgroundColor: c }}
+    />
+  ))}
+</div>
+
 
         {/* Stroke Width */}
         <div className="mb-4">

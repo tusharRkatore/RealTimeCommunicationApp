@@ -66,7 +66,6 @@ export function DashboardClient({
           name: roomName,
           description: roomDescription,
           host_id: user.id,
-          is_active: true,
         })
         .select()
         .single()
@@ -86,32 +85,34 @@ export function DashboardClient({
       router.replace(`/room/${room.id}`)
     } catch (err) {
       console.error("Create room failed:", err)
+      alert("Failed to create room")
     } finally {
       setIsCreating(false)
     }
   }
 
-  /* ---------------- DELETE ROOM (HOST ONLY) ---------------- */
+  /* ---------------- DELETE ROOM (FIXED) ---------------- */
 
   const handleDeleteRoom = async (roomId: string) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this room? This action cannot be undone."
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this room permanently?"
     )
 
-    if (!confirmDelete) return
+    if (!confirmed) return
 
     const { error } = await supabase
       .from("rooms")
-      .update({ is_active: false })
+      .delete() // ✅ HARD DELETE (FIX)
       .eq("id", roomId)
       .eq("host_id", user.id)
 
     if (error) {
+      console.error("Delete room error:", error)
       alert("Failed to delete room")
-      console.error(error)
       return
     }
 
+    alert("Room deleted successfully")
     router.refresh()
   }
 
@@ -175,9 +176,7 @@ export function DashboardClient({
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create New Room</DialogTitle>
-              <DialogDescription>
-                Start a new meeting
-              </DialogDescription>
+              <DialogDescription>Start a new meeting</DialogDescription>
             </DialogHeader>
 
             <form onSubmit={handleCreateRoom} className="space-y-4">
@@ -198,11 +197,7 @@ export function DashboardClient({
                 />
               </div>
 
-              <Button
-                type="submit"
-                disabled={isCreating}
-                className="w-full"
-              >
+              <Button type="submit" disabled={isCreating} className="w-full">
                 {isCreating ? "Creating..." : "Create"}
               </Button>
             </form>
@@ -234,7 +229,6 @@ export function DashboardClient({
                   <Link href={`/room/${room.id}`}>Join Room</Link>
                 </Button>
 
-                {/* DELETE BUTTON – HOST ONLY */}
                 {room.host_id === user.id && (
                   <Button
                     variant="destructive"

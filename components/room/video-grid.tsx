@@ -1,11 +1,11 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
 import { Card } from "@/components/ui/card"
-import { VideoOff, MicOff } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
 import type { Profile } from "@/lib/types/database"
 import { SignalingService } from "@/lib/webrtc/signaling"
-import { createClient } from "@/lib/supabase/client"
+import { MicOff, VideoOff } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 
 interface VideoGridProps {
   roomId: string
@@ -48,7 +48,7 @@ export function VideoGrid({ roomId, userId, profile, isVideoEnabled, isAudioEnab
         await signaling.init(stream)
 
         signaling.onPeerConnected(async (peerId, remoteStream) => {
-          console.log("[v0] Peer connected:", peerId)
+          console.log("[ ] Peer connected:", peerId)
 
           // Fetch participant name
           const supabase = createClient()
@@ -72,7 +72,7 @@ export function VideoGrid({ roomId, userId, profile, isVideoEnabled, isAudioEnab
         })
 
         signaling.onPeerDisconnected((peerId) => {
-          console.log("[v0] Peer disconnected:", peerId)
+          console.log("[ ] Peer disconnected:", peerId)
           setRemoteParticipants((prev) => prev.filter((p) => p.userId !== peerId))
           setParticipantNames((prev) => {
             const newMap = new Map(prev)
@@ -83,7 +83,7 @@ export function VideoGrid({ roomId, userId, profile, isVideoEnabled, isAudioEnab
 
         signalingServiceRef.current = signaling
       } catch (error) {
-        console.error("[v0] Error accessing media devices:", error)
+        console.error("[ ] Error accessing media devices:", error)
       }
     }
 
